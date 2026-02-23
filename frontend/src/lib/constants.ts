@@ -1,6 +1,6 @@
 import type { Persona } from "./types";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 export const PERSONA_CONFIG: Record<
   Persona,

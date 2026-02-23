@@ -88,7 +88,10 @@ export async function uploadFile(
 export function createVoiceSocket(
   vocabularyName?: string
 ): WebSocket {
-  const wsBase = API_BASE.replace(/^http/, "ws");
+  // WebSocket cannot go through Vercel proxy, connect directly to backend
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL
+    || API_BASE.replace(/^http/, "ws")
+    || `ws://${window.location.hostname}:8000`;
   const params = vocabularyName ? `?vocabulary=${vocabularyName}` : "";
-  return new WebSocket(`${wsBase}/api/ws/voice${params}`);
+  return new WebSocket(`${wsUrl}/api/ws/voice${params}`);
 }
