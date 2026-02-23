@@ -9,10 +9,10 @@ from core.config import get_settings
 
 def _get_s3_client():
     settings = get_settings()
-    session = boto3.Session(
-        profile_name=settings.aws_profile,
-        region_name=settings.aws_region,
-    )
+    session_kwargs = {"region_name": settings.aws_region}
+    if settings.aws_profile:
+        session_kwargs["profile_name"] = settings.aws_profile
+    session = boto3.Session(**session_kwargs)
     return session.client("s3")
 
 

@@ -4,7 +4,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     # AWS (Named Profile — credentials are in ~/.aws/credentials)
-    aws_profile: str = "interview-pilot"
+    aws_profile: str = ""
     aws_region: str = "us-east-1"
 
     # Bedrock Models
@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 
     # App
     app_env: str = "development"
+    app_password: str = ""  # If set, require this password for API access
     frontend_url: str = "http://localhost:3000"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}

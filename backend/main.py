@@ -1,9 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from core.auth import verify_password
 from core.config import get_settings
 from api.interview import router as interview_router
 from api.voice_ws import router as voice_router
@@ -23,11 +24,9 @@ async def lifespan(app: FastAPI):
         # Seed default company-role if empty
         db = get_db()
         if db is not None:
-            existing = db.query(CompanyRole).first()
-            if existing is None:
-                from core.seed import seed_company_roles
-                seed_company_roles(db)
-                logger.info("Seeded default company-role data.")
+            from core.seed import seed_company_roles
+            seed_company_roles(db)
+            logger.info("Company-role seed data synced.")
             db.close()
     except Exception as e:
         logger.warning("DB init skipped (DB unavailable): %s", e)
@@ -54,11 +53,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(interview_router, prefix="/api")
-app.include_router(voice_router, prefix="/api")
-app.include_router(upload_router, prefix="/api")
+app.include_router(interview_router, prefix="/api", dependencies=[Depends(verify_password)])
+app.include_router(voice_router, prefix="/api")  # WebSocket handles auth separately
+app.include_router(upload_router, prefix="/api", dependencies=[Depends(verify_password)])
 
 
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+
+@app.get("/api/auth/check")
+async def auth_check():
+    """Public endpoint: returns whether password is required."""
+    return {"required": bool(settings.app_password)}

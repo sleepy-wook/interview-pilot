@@ -8,6 +8,7 @@ import ResearchProgress from "@/components/ResearchProgress";
 import InterviewChat from "@/components/InterviewChat";
 import Report from "@/components/Report";
 import HistoryList from "@/components/HistoryList";
+import PasswordGate from "@/components/PasswordGate";
 
 export default function Home() {
   const [phase, setPhase] = useState<Phase>("setup");
@@ -70,6 +71,7 @@ export default function Home() {
   }, []);
 
   return (
+    <PasswordGate>
     <div className="min-h-screen bg-white flex flex-col">
       {/* History sidebar */}
       <HistoryList visible={phase === "setup"} />
@@ -136,5 +138,6 @@ export default function Home() {
         </div>
       )}
     </div>
+    </PasswordGate>
   );
 }

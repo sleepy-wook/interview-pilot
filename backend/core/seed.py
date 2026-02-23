@@ -6,11 +6,16 @@ from core.database import CompanyRole
 
 
 def seed_company_roles(db) -> None:
-    """Insert default company-role presets."""
-    presets = [_databricks_korea_se()]
+    """Insert default company-role presets (skips already-existing ones)."""
+    presets = [_databricks_korea_se(), _bosch_korea_erp_sm()]
     for data in presets:
-        cr = CompanyRole(**data)
-        db.add(cr)
+        existing = (
+            db.query(CompanyRole)
+            .filter_by(company=data["company"], role=data["role"])
+            .first()
+        )
+        if existing is None:
+            db.add(CompanyRole(**data))
     db.commit()
 
 
@@ -162,5 +167,147 @@ def _databricks_korea_se() -> dict:
             ],
             "experience_level": "mid",
             "summary": "Pre-sales Solutions Engineer for Databricks Korea, combining technical expertise with customer engagement",
+        },
+    }
+
+
+def _bosch_korea_erp_sm() -> dict:
+    return {
+        "company": "Bosch Korea",
+        "role": "ERP SM (Solution Manager)",
+        "role_description": (
+            "ERP Solution Manager responsible for managing and optimizing SAP ERP systems "
+            "across Bosch Korea's manufacturing and business operations. Leads ERP solution design, "
+            "implementation, and continuous improvement. Bridges business requirements with technical "
+            "solutions, coordinates with global Bosch IT teams, and ensures alignment with Bosch's "
+            "digital transformation strategy."
+        ),
+        "required_competencies": [
+            "ERP solution design -- architect end-to-end SAP solutions for manufacturing and business processes",
+            "Business process analysis -- map and optimize business processes (procurement, production, sales, finance)",
+            "Stakeholder management -- manage expectations of business users, IT teams, and global counterparts",
+            "Project management -- lead ERP implementation and enhancement projects on time and budget",
+            "Change management -- drive user adoption and organizational change for new ERP processes",
+            "Cross-functional coordination -- work with manufacturing, finance, logistics, and IT departments",
+            "Vendor management -- coordinate with SAP consultants and implementation partners",
+            "Continuous improvement -- identify optimization opportunities in existing ERP landscape",
+        ],
+        "technical_skills": [
+            "SAP ERP (S/4HANA, ECC) -- deep functional knowledge across core modules",
+            "SAP modules: MM (Materials Management), PP (Production Planning), SD (Sales & Distribution), FI/CO (Finance & Controlling)",
+            "SAP Solution Manager -- monitoring, testing, change management, ITSM",
+            "SAP BTP (Business Technology Platform) -- integration and extension capabilities",
+            "ABAP basics -- ability to read and understand custom developments",
+            "SAP Fiori / UI5 -- modern user interface concepts",
+            "Integration technologies (RFC, IDoc, BAPI, OData, PI/PO, CPI)",
+            "Data migration and conversion strategies",
+            "Manufacturing execution systems (MES) integration",
+            "Business intelligence (SAP BW, Analytics Cloud)",
+            "SQL and database concepts for troubleshooting and reporting",
+        ],
+        "soft_skills": [
+            "Communication excellence -- explain technical solutions to non-technical business stakeholders (Korean + English)",
+            "Analytical thinking -- break down complex business problems into structured solutions",
+            "Leadership -- guide project teams and influence without direct authority",
+            "Cultural adaptability -- work effectively with German HQ and global teams",
+            "Problem-solving -- troubleshoot production issues under time pressure",
+            "Documentation skills -- create clear functional specifications and process documentation",
+            "Negotiation -- balance business demands with technical constraints and timelines",
+            "Collaboration -- work across departments and geographies in a matrix organization",
+        ],
+        "interview_rounds": [
+            {
+                "name": "HR Screening",
+                "duration": "30 min",
+                "description": "Background review, motivation for Bosch, salary expectations, language proficiency check.",
+            },
+            {
+                "name": "Hiring Manager Interview",
+                "duration": "60 min",
+                "description": (
+                    "Deep dive into ERP project experience, leadership examples, "
+                    "understanding of Bosch business and manufacturing processes. "
+                    "Behavioral questions on teamwork and conflict resolution."
+                ),
+            },
+            {
+                "name": "Technical Interview",
+                "duration": "60 min",
+                "description": (
+                    "SAP module knowledge, solution design scenarios, integration architecture, "
+                    "troubleshooting cases, S/4HANA migration strategy discussion."
+                ),
+            },
+            {
+                "name": "Case Study / Presentation",
+                "duration": "45-60 min",
+                "description": (
+                    "Present a past ERP project or solve a business case: "
+                    "requirements gathering, solution design, implementation approach, risk mitigation."
+                ),
+            },
+        ],
+        "question_types": [
+            "Why Bosch? Why ERP Solution Manager?",
+            "Describe your experience with SAP S/4HANA implementation or migration",
+            "Walk me through an ERP project you led from requirements to go-live",
+            "How do you handle conflicting requirements from different business departments?",
+            "Explain your approach to ERP change management and user adoption",
+            "Technical: How would you design an integration between SAP and a third-party MES?",
+            "Scenario: Production is down due to an SAP issue -- walk me through your troubleshooting process",
+            "How do you prioritize enhancement requests in a large ERP landscape?",
+            "Describe a time you had to push back on a stakeholder's requirement",
+            "How do you stay current with SAP technology and Bosch digital transformation initiatives?",
+        ],
+        "interview_tips": [
+            "Know Bosch's business: automotive (Mobility Solutions), industrial tech, consumer goods, energy",
+            "Understand Bosch values: Invented for life, quality, reliability, innovation",
+            "Prepare concrete examples of ERP projects with measurable outcomes (cost savings, efficiency gains)",
+            "Be ready to discuss SAP S/4HANA vs ECC differences and migration strategies",
+            "Show understanding of manufacturing processes (MRP, production scheduling, quality management)",
+            "Demonstrate ability to work in a global matrix organization (Korean office + German HQ)",
+            "Prepare a structured case study presentation with clear problem-solution-outcome flow",
+            "Highlight both technical depth and business acumen -- this role bridges both worlds",
+        ],
+        "jd_structured": {
+            "requirements": [
+                "5+ years of SAP ERP experience in a manufacturing environment",
+                "Deep functional knowledge in at least 2 SAP modules (MM, PP, SD, FI/CO)",
+                "Project management experience for ERP implementations or enhancements",
+                "Business process understanding in manufacturing, supply chain, or finance",
+                "Korean native + business-level English (German is a plus)",
+            ],
+            "responsibilities": [
+                "Manage and optimize SAP ERP solutions for Bosch Korea operations",
+                "Lead requirements gathering and solution design for ERP enhancements",
+                "Coordinate with global Bosch IT teams on system changes and upgrades",
+                "Ensure smooth ERP operations and provide L2/L3 support",
+                "Drive S/4HANA migration readiness and digital transformation initiatives",
+                "Manage relationships with external SAP consultants and partners",
+            ],
+            "qualifications": {
+                "required": [
+                    "Bachelor's degree in IT, Engineering, or Business",
+                    "SAP ERP experience (S/4HANA or ECC)",
+                    "Manufacturing industry experience",
+                    "Korean native speaker with business English proficiency",
+                ],
+                "preferred": [
+                    "SAP certification in one or more modules",
+                    "S/4HANA migration project experience",
+                    "ABAP development or debugging ability",
+                    "Experience in automotive or electronics manufacturing",
+                    "German language skills",
+                ],
+            },
+            "keywords": [
+                "SAP", "S/4HANA", "ECC", "ERP", "ABAP", "Fiori",
+                "MM", "PP", "SD", "FI/CO", "Solution Manager",
+                "manufacturing", "MES", "integration", "PI/PO", "CPI",
+                "BTP", "data migration", "change management",
+                "Bosch", "automotive", "IoT",
+            ],
+            "experience_level": "mid-senior",
+            "summary": "ERP Solution Manager for Bosch Korea, managing SAP systems across manufacturing and business operations",
         },
     }

@@ -1,4 +1,5 @@
 import { API_BASE } from "./constants";
+import { getStoredPassword } from "@/components/PasswordGate";
 import type {
   StartRequest,
   StartResponse,
@@ -11,9 +12,14 @@ import type {
   CompanyRolesResponse,
 } from "./types";
 
+function authHeaders(): Record<string, string> {
+  const pw = getStoredPassword();
+  return pw ? { "Content-Type": "application/json", "X-App-Password": pw } : { "Content-Type": "application/json" };
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}/api/interview${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: authHeaders(),
     ...options,
   });
   if (!res.ok) {
@@ -72,9 +78,11 @@ export async function uploadFile(
 ): Promise<{ filename: string; path: string }> {
   const form = new FormData();
   form.append("file", file);
+  const pw = getStoredPassword();
   const res = await fetch(`${API_BASE}/api/upload`, {
     method: "POST",
     body: form,
+    ...(pw ? { headers: { "X-App-Password": pw } } : {}),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -92,6 +100,10 @@ export function createVoiceSocket(
   const wsUrl = process.env.NEXT_PUBLIC_WS_URL
     || API_BASE.replace(/^http/, "ws")
     || `ws://${window.location.hostname}:8000`;
-  const params = vocabularyName ? `?vocabulary=${vocabularyName}` : "";
-  return new WebSocket(`${wsUrl}/api/ws/voice${params}`);
+  const searchParams = new URLSearchParams();
+  if (vocabularyName) searchParams.set("vocabulary", vocabularyName);
+  const pw = getStoredPassword();
+  if (pw) searchParams.set("password", pw);
+  const qs = searchParams.toString();
+  return new WebSocket(`${wsUrl}/api/ws/voice${qs ? `?${qs}` : ""}`);
 }

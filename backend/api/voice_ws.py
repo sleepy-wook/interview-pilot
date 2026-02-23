@@ -23,6 +23,7 @@ import time
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from core.config import get_settings
 from core.transcribe_client import TranscribeStreamer
 
 router = APIRouter()
@@ -31,6 +32,14 @@ router = APIRouter()
 @router.websocket("/ws/voice")
 async def voice_websocket(ws: WebSocket):
     """WebSocket endpoint for real-time voice → text transcription."""
+    # Check password for WebSocket via query param
+    settings = get_settings()
+    if settings.app_password:
+        pw = ws.query_params.get("password", "")
+        if pw != settings.app_password:
+            await ws.close(code=4401, reason="Invalid password")
+            return
+
     await ws.accept()
 
     # Get optional vocabulary name from query params
